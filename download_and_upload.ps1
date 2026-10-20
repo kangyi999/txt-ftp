@@ -1,8 +1,16 @@
-﻿# download_and_upload.ps1
-# 2个远程源
+# download_and_upload.ps1
+# 每个源配置：下载链接、本地文件名、FTP远端目录
 $urlList = @(
-    @{url="https://raw.githubusercontent.com/kangyi888/iptv-auto/main/output/out1.m3u"; localName="fy01.txt"},
-    @{url="https://raw.githubusercontent.com/kangyi888/iptv-auto/main/output/out2.m3u"; localName="ky01.txt"}
+    @{
+        url="https://raw.githubusercontent.com/kangyi888/iptv-auto/main/output/out1.m3u"
+        localName="fy01.txt"
+        ftpDir="fy"
+    },
+    @{
+        url="https://raw.githubusercontent.com/kangyi888/iptv-auto/main/output/out3.txt"
+        localName="ky01.txt"
+        ftpDir="ky"
+    }
 )
 
 $headers = @{
@@ -36,18 +44,19 @@ foreach($item in $urlList){
 $ftpHost = $env:FTP_HOST
 $ftpUser = $env:FTP_USER
 $ftpPass = $env:FTP_PASS
-$ftpRemoteDir = $env:FTP_REMOTE_DIR
 
 $securePass = ConvertTo-SecureString $ftpPass -AsPlainText -Force
 $cred = New-Object System.Management.Automation.PSCredential($ftpUser, $securePass)
 
 foreach($item in $urlList){
     $localFile = $item.localName
+    $remoteSubDir = $item.ftpDir
     if(-not (Test-Path $localFile)){
         Write-Host "File $localFile not found, skip upload"
         continue
     }
-    $ftpFullPath = "ftp://$ftpHost/$ftpRemoteDir/$localFile"
+    # 拼接FTP地址：ftp://服务器/子目录/文件名
+    $ftpFullPath = "ftp://$ftpHost/$remoteSubDir/$localFile"
     Write-Host "Uploading $localFile to $ftpFullPath"
     try{
         $webClient = New-Object System.Net.WebClient
@@ -59,3 +68,4 @@ foreach($item in $urlList){
         Write-Host "Upload failed $localFile : $_"
     }
 }
+
