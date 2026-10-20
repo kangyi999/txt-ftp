@@ -2,9 +2,9 @@ name: Download and FTP Upload
 run-name: Download source then upload to FTP
 on:
   schedule:
-    # 定时：UTC时间，转换北京时间需要+8，示例：每天早上8点北京时间
+    # UTC时间，北京时间=UTC+8
     - cron: '0 0 * * *'
-  workflow_dispatch: # 支持手动点击运行
+  workflow_dispatch:
 
 jobs:
   run-task:
@@ -13,7 +13,6 @@ jobs:
       FTP_HOST: ${{ secrets.FTP_HOST }}
       FTP_USER: ${{ secrets.FTP_USER }}
       FTP_PASS: ${{ secrets.FTP_PASS }}
-      FTP_REMOTE_DIR: ${{ secrets.FTP_REMOTE_DIR }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
